@@ -369,6 +369,9 @@
                         const capitalizedColor = color.charAt(0).toUpperCase() + color.slice(1);
 
                         const price = type.category === 'terminal' ? 12.90 : 18.90;
+                        const specs = type.category === 'terminal'
+                            ? 'Peso: 0,340 gramas | Comprimento: 45 cm | Largura: 12,5 cm'
+                            : 'Peso: 0,650 gramas | Comprimento: 30 cm | Largura: 32 cm';
 
                         productsToInsert.push({
                             name: `${type.name} - ${capitalizedColor}`,
@@ -377,7 +380,7 @@
                             category: type.category,
                             price: price,
                             image_url: `assets/produtos/${type.prefix}_${fileNameColor}.jpg`,
-                            description: `${type.name} na cor ${color}. Produzido pela ${brand}. Garantia de qualidade e durabilidade.`
+                            description: `${type.name} na cor ${color}. Produzido pela ${brand}. ${specs}. Garantia de qualidade.`
                         });
                     });
                 });
@@ -422,6 +425,9 @@
                     if (color === 'marfim' && typeInfo.prefix === 'terminal') fileNameColor = 'marfin';
 
                     const price = typeInfo.category === 'terminal' ? 12.90 : 18.90;
+                    const specs = typeInfo.category === 'terminal'
+                        ? 'Peso: 0,340 gramas | Comprimento: 45 cm | Largura: 12,5 cm'
+                        : 'Peso: 0,650 gramas | Comprimento: 30 cm | Largura: 32 cm';
 
                     productsToInsert.push({
                         name: typeInfo.name,
@@ -430,7 +436,7 @@
                         category: typeInfo.category,
                         price: price,
                         image_url: `assets/produtos/${typeInfo.prefix}_${fileNameColor}.jpg`,
-                        description: `${typeInfo.name} da marca ${brand} na cor ${color}.`
+                        description: `${typeInfo.name} da marca ${brand} na cor ${color}. ${specs}.`
                     });
                 });
             });

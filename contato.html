@@ -195,9 +195,14 @@
                             'Accept': 'application/json'
                         },
                         body: JSON.stringify({
-                            ...formData,
-                            _subject: `Novo Contato do Site: ${formData.subject}`,
-                            _template: 'table'
+                            "Nome": formData.full_name,
+                            "E-mail": formData.email,
+                            "Assunto": formData.subject,
+                            "Mensagem": formData.message,
+                            _subject: `Novo Contato Noble: ${formData.subject}`,
+                            _template: 'table',
+                            _language: 'pt-BR',
+                            _captcha: 'false'
                         })
                     });
 
