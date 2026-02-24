@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos e Privacidade | Noble Acabamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+    <style>
+        .legal-container {
+            padding-top: 150px;
+            padding-bottom: 100px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .legal-container h1 {
+            margin-bottom: 2rem;
+            color: var(--accent);
+        }
+
+        .legal-container h2 {
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .legal-container p {
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
+                    <span>NOBLE</span> ACABAMENTOS
+                </a>
+                <ul class="nav-links" style="display: flex;">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="quem-somos.html">Quem Somos</a></li>
+                    <li><a href="loja.html">Loja</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li id="auth-link"><a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container legal-container">
+        <a href="index.html" class="back-link">← Voltar para Home</a>
+
+        <h1>Termos e Condições & Política de Privacidade</h1>
+
+        <section id="termos" style="padding: 0;">
+            <h2>1. Termos de Uso</h2>
+            <p>Ao acessar o site da Noble Acabamentos, você concorda em cumprir estes termos de serviço, todas as leis e
+                regulamentos aplicáveis ​​e concorda que é responsável pelo cumprimento de todas as leis locais
+                aplicáveis.</p>
+            <p>Estes materiais são protegidos pelas leis de direitos autorais e marcas comerciais aplicáveis.</p>
+        </section>
+
+        <section id="privacidade" style="padding: 0;">
+            <h2>2. Política de Privacidade</h2>
+            <p>A sua privacidade é importante para nós. É política da Noble Acabamentos respeitar a sua privacidade em
+                relação a qualquer informação sua que possamos coletar no site Noble Acabamentos.</p>
+            <p>Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço.
+                Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento.</p>
+            <p>Não compartilhamos informações de identificação pessoal publicamente ou com terceiros, exceto quando
+                exigido por lei.</p>
+        </section>
+
+        <section id="contato-legal" style="padding: 0;">
+            <h2>3. Contato</h2>
+            <p>Se você tiver alguma dúvida sobre nossos termos ou nossa política de privacidade, entre em contato
+                conosco através do telefone (48) 98879-9001 ou visite nossa sede em Rua Zelcy Burigo, 658, Jardim
+                Itália, Cocal do Sul/SC.</p>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noble Acabamentos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODUyODMsImV4cCI6MjA4NzM2MTI4M30.Zkn5oXvHzqAvOyIrEUQeRLFto_dibEQo9ynBqtidQv8';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function updateAuthButton() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authLink = document.getElementById('auth-link');
+            if (session) {
+                authLink.innerHTML = `<a href="#" onclick="handleLogout()" class="btn-nav">Sair</a>`;
+            } else {
+                authLink.innerHTML = `<a href="login.html" class="btn-nav">Entrar</a>`;
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateAuthButton);
+    </script>
+</body>
+
+</html>

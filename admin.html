@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo | Noble Acabamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-container {
+            padding-top: 120px;
+            padding-bottom: 100px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-light);
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: -1.2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .product-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            margin-bottom: 3rem;
+            display: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .admin-table th,
+        .admin-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .admin-table th {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+        }
+
+        .btn-edit {
+            background: #3498db;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
+                    <span>NOBLE</span> ACABAMENTOS
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="loja.html">Loja</a></li>
+                    <li><a href="admin.html">Admin</a></li>
+                    <li id="auth-link"><a href="#" onclick="handleLogout()" class="btn-nav">Sair</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container admin-container">
+        <div class="admin-header">
+            <h1>Painel Administrativo</h1>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="toggleForm()" class="btn">Novo Produto</button>
+                <button onclick="seedInitialData()" class="btn btn-edit" style="background-color: #27ae60;">Resetar e
+                    Gerar 60 Produtos</button>
+            </div>
+        </div>
+
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('manage')">Gerenciar</button>
+            <button class="tab-btn" onclick="switchTab('bulk')">Gerador em Lote</button>
+        </div>
+
+        <div id="bulk-section"
+            style="display: none; background: white; padding: 2rem; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 3rem;">
+            <h2>Gerador de Variações</h2>
+            <p style="margin-bottom: 1.5rem; color: var(--text-light);">Crie múltiplas combinações de produtos, marcas e
+                cores rapidamente.</p>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Marcas (uma por linha)</label>
+                    <textarea id="bulk-brands" rows="5"
+                        placeholder="Cejatel Telhas&#10;Karina Telhas&#10;Vilhena Grês&#10;Temax Telhas&#10;Tettogres"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Cores (padrão do sistema)</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="grafite"
+                                checked> Grafite</label>
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="cinza"
+                                checked> Cinza</label>
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="branco"
+                                checked> Branco</label>
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="caramelo"
+                                checked> Caramelo</label>
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="marfim"
+                                checked> Marfim</label>
+                        <label style="font-weight: 400;"><input type="checkbox" class="color-check" value="vinho"
+                                checked> Vinho</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Produto Base</label>
+                    <select id="bulk-product-type">
+                        <option value="terminal">Terminal de Cumeeira</option>
+                        <option value="terminal3vias">Conexão 3 Vias</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="generateBulk()" class="btn" style="margin-top: 1rem;">Gerar Combinações</button>
+        </div>
+
+        <div id="manage-section">
+            <div id="product-form" class="product-form">
+                <h2 id="form-title" style="margin-bottom: 1.5rem;">Cadastrar Produto</h2>
+                <form id="crud-form">
+                    <input type="hidden" id="p-id">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome do Produto</label>
+                            <input type="text" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Marca</label>
+                            <input type="text" id="brand" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Cor</label>
+                            <input type="text" id="color" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Categoria</label>
+                            <select id="category">
+                                <option value="terminal">Terminal</option>
+                                <option value="conexao">Conexão</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Preço (R$)</label>
+                            <input type="number" step="0.01" id="price">
+                        </div>
+                        <div class="form-group">
+                            <label>URL da Imagem</label>
+                            <input type="text" id="image_url" placeholder="assets/product_placeholder.jpg">
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label>Descrição</label>
+                        <textarea id="description" rows="3"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                        <button type="submit" class="btn">Salvar Produto</button>
+                        <button type="button" onclick="cancelEdit()" class="btn"
+                            style="background: #95a5a6;">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="loading" class="loading">Carregando produtos...</div>
+            <table id="product-table" class="admin-table" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Marca</th>
+                        <th>Cor</th>
+                        <th>Preço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="p-list"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODUyODMsImV4cCI6MjA4NzM2MTI4M30.Zkn5oXvHzqAvOyIrEUQeRLFto_dibEQo9ynBqtidQv8';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function checkAdmin() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+
+            if (!session) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const { data: profile, error } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+            if (error || !profile || profile.role !== 'admin') {
+                alert('Acesso negado. Apenas administradores podem acessar esta página.');
+                window.location.href = 'loja.html';
+            } else {
+                loadProducts();
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'index.html';
+        }
+
+        let products = [];
+
+        async function loadProducts() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('product-table').style.display = 'none';
+
+            const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+
+            if (error) {
+                alert('Erro ao carregar produtos: ' + error.message);
+                return;
+            }
+
+            products = data;
+            const tbody = document.getElementById('p-list');
+            tbody.innerHTML = '';
+
+            products.forEach(p => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${p.name}</td>
+                        <td>${p.brand}</td>
+                        <td>${p.color}</td>
+                        <td>R$ ${p.price || '0.00'}</td>
+                        <td>
+                            <button onclick="editProduct('${p.id}')" class="btn btn-sm btn-edit">Editar</button>
+                            <button onclick="deleteProduct('${p.id}')" class="btn btn-sm btn-delete">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('product-table').style.display = 'table';
+        }
+
+        function switchTab(tab) {
+            const btns = document.querySelectorAll('.tab-btn');
+            btns.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'manage') {
+                document.getElementById('manage-section').style.display = 'block';
+                document.getElementById('bulk-section').style.display = 'none';
+            } else {
+                document.getElementById('manage-section').style.display = 'none';
+                document.getElementById('bulk-section').style.display = 'block';
+            }
+        }
+
+        async function seedInitialData() {
+            if (!confirm('Esta ação irá apagar todos os produtos atuais e gerar as 60 variações (2 produtos * 5 marcas * 6 cores). Deseja continuar?')) return;
+
+            document.getElementById('loading').style.display = 'block';
+
+            // Delete current products
+            await supabaseClient.from('products').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+
+            const brands = ['Cejatel Telhas', 'Karina Telhas', 'Vilhena Grês', 'Temax Telhas', 'Tettogres'];
+            const colors = ['vinho', 'grafite', 'branco', 'caramelo', 'marfim', 'cinza'];
+            const types = [
+                { name: 'Terminal de Cumeeira', category: 'terminal', prefix: 'terminal' },
+                { name: 'Conexão 3 Vias', category: 'conexao', prefix: 'terminal3vias' }
+            ];
+
+            const productsToInsert = [];
+
+            types.forEach(type => {
+                brands.forEach(brand => {
+                    colors.forEach(color => {
+                        // Special fix for marfim/marfin spelling in files
+                        let fileNameColor = color;
+                        if (color === 'marfim' && type.prefix === 'terminal') fileNameColor = 'marfin'; // As seen in assets/produtos
+
+                        // Format color name for the product title (capitalize first letter)
+                        const capitalizedColor = color.charAt(0).toUpperCase() + color.slice(1);
+
+                        const price = type.category === 'terminal' ? 12.90 : 18.90;
+
+                        productsToInsert.push({
+                            name: `${type.name} - ${capitalizedColor}`,
+                            brand: brand,
+                            color: color,
+                            category: type.category,
+                            price: price,
+                            image_url: `assets/produtos/${type.prefix}_${fileNameColor}.jpg`,
+                            description: `${type.name} na cor ${color}. Produzido pela ${brand}. Garantia de qualidade e durabilidade.`
+                        });
+                    });
+                });
+            });
+
+            const { error } = await supabaseClient.from('products').insert(productsToInsert);
+
+            if (error) {
+                alert('Erro ao gerar dados: ' + error.message);
+            } else {
+                alert('60 produtos gerados com sucesso!');
+                loadProducts();
+                switchTab('manage');
+            }
+        }
+
+        async function generateBulk() {
+            const brandsText = document.getElementById('bulk-brands').value.trim();
+            if (!brandsText) {
+                alert('Por favor, informe ao menos uma marca.');
+                return;
+            }
+
+            const brands = brandsText.split('\n').map(b => b.trim()).filter(b => b);
+            const checkboxes = document.querySelectorAll('.color-check:checked');
+            const colors = Array.from(checkboxes).map(cb => cb.value);
+            const productType = document.getElementById('bulk-product-type').value;
+
+            if (colors.length === 0) {
+                alert('Selecione ao menos uma cor.');
+                return;
+            }
+
+            const typeInfo = productType === 'terminal'
+                ? { name: 'Terminal de Cumeeira', category: 'terminal', prefix: 'terminal' }
+                : { name: 'Conexão 3 Vias', category: 'conexao', prefix: 'terminal3vias' };
+
+            const productsToInsert = [];
+            brands.forEach(brand => {
+                colors.forEach(color => {
+                    let fileNameColor = color;
+                    if (color === 'marfim' && typeInfo.prefix === 'terminal') fileNameColor = 'marfin';
+
+                    const price = typeInfo.category === 'terminal' ? 12.90 : 18.90;
+
+                    productsToInsert.push({
+                        name: typeInfo.name,
+                        brand: brand,
+                        color: color,
+                        category: typeInfo.category,
+                        price: price,
+                        image_url: `assets/produtos/${typeInfo.prefix}_${fileNameColor}.jpg`,
+                        description: `${typeInfo.name} da marca ${brand} na cor ${color}.`
+                    });
+                });
+            });
+
+            const { error } = await supabaseClient.from('products').insert(productsToInsert);
+
+            if (error) {
+                alert('Erro: ' + error.message);
+            } else {
+                alert(`Sucesso! ${productsToInsert.length} variações criadas.`);
+                loadProducts();
+                switchTab('manage');
+            }
+        }
+
+        function toggleForm() {
+            const form = document.getElementById('product-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            if (form.style.display === 'block') {
+                document.getElementById('form-title').textContent = 'Cadastrar Produto';
+                document.getElementById('crud-form').reset();
+                document.getElementById('p-id').value = '';
+            }
+        }
+
+        function cancelEdit() {
+            document.getElementById('product-form').style.display = 'none';
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+
+            const { error } = await supabaseClient.from('products').delete().eq('id', id);
+
+            if (error) {
+                alert('Erro ao excluir: ' + error.message);
+            } else {
+                loadProducts();
+            }
+        }
+
+        function editProduct(id) {
+            const p = products.find(prod => prod.id === id);
+            if (!p) return;
+
+            document.getElementById('form-title').textContent = 'Editar Produto';
+            document.getElementById('p-id').value = p.id;
+            document.getElementById('name').value = p.name;
+            document.getElementById('brand').value = p.brand;
+            document.getElementById('color').value = p.color;
+            document.getElementById('category').value = p.category || 'terminal';
+            document.getElementById('price').value = p.price;
+            document.getElementById('image_url').value = p.image_url;
+            document.getElementById('description').value = p.description;
+
+            document.getElementById('product-form').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.getElementById('crud-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('p-id').value;
+            const productData = {
+                name: document.getElementById('name').value,
+                brand: document.getElementById('brand').value,
+                color: document.getElementById('color').value,
+                category: document.getElementById('category').value,
+                price: parseFloat(document.getElementById('price').value) || 0,
+                image_url: document.getElementById('image_url').value || 'assets/product_placeholder.jpg',
+                description: document.getElementById('description').value
+            };
+
+            let error;
+            if (id) {
+                const result = await supabaseClient.from('products').update(productData).eq('id', id);
+                error = result.error;
+            } else {
+                const result = await supabaseClient.from('products').insert([productData]);
+                error = result.error;
+            }
+
+            if (error) {
+                alert('Erro ao salvar: ' + error.message);
+            } else {
+                document.getElementById('product-form').style.display = 'none';
+                loadProducts();
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', checkAdmin);
+    </script>
+</body>
+
+</html>

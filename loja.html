@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja | Noble Acabamentos</title>
+    <meta name="description"
+        content="Explore nossa linha de terminais de telhas e conexões de 3 vias. Produtos premium para acabamento de telhados.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .shop-header {
+            padding: 150px 0 50px;
+            text-align: center;
+            background: var(--white);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-bottom: 100px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-brand {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .product-name {
+            font-size: 1.25rem;
+            margin: 0.5rem 0;
+            font-weight: 700;
+        }
+
+        .product-color {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 50px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
+                    <span>NOBLE</span> ACABAMENTOS
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="quem-somos.html">Quem Somos</a></li>
+                    <li><a href="loja.html">Loja</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li id="auth-link"><a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="shop-header">
+        <div class="container">
+            <h1>Nossa Loja</h1>
+            <p style="margin-top: 1rem; color: var(--text-light);">Terminais e conexões de alta qualidade para o seu
+                projeto.</p>
+        </div>
+    </div>
+
+    <section style="padding: 0;">
+        <div class="container">
+            <div id="loading" class="loading">Carregando produtos...</div>
+            <div id="products" class="product-grid" style="display: none;">
+                <!-- Products will be loaded here -->
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h4>Noble Acabamentos</h4>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 1rem;">Beleza e proteção para o
+                        seu lar.</p>
+                </div>
+                <div>
+                    <h4>Links Úteis</h4>
+                    <ul style="list-style: none; margin-top: 1rem;">
+                        <li><a href="legal.html" style="font-size: 0.9rem; color: var(--text-light);">Termos e
+                                Condições</a></li>
+                        <li><a href="legal.html" style="font-size: 0.9rem; color: var(--text-light);">Política de
+                                Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noble Acabamentos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Supabase configuration
+        const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODUyODMsImV4cCI6MjA4NzM2MTI4M30.Zkn5oXvHzqAvOyIrEUQeRLFto_dibEQo9ynBqtidQv8';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function updateAuthButton() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authLink = document.getElementById('auth-link');
+
+            if (session) {
+                authLink.innerHTML = `<a href="#" onclick="handleLogout()" class="btn-nav">Sair</a>`;
+            } else {
+                authLink.innerHTML = `<a href="login.html" class="btn-nav">Entrar</a>`;
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        async function fetchProducts() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .order('name', { ascending: true });
+
+                if (error) throw error;
+
+                displayProducts(data);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                document.getElementById('loading').innerHTML = 'Ocorreu um erro ao carregar os produtos. Verifique se as tabelas foram criadas no Supabase.';
+            }
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById('products');
+            const loading = document.getElementById('loading');
+
+            if (!products || products.length === 0) {
+                loading.innerHTML = 'Nenhum produto encontrado. Adicione produtos na tabela "products" do Supabase.';
+                loading.style.display = 'block';
+                container.style.display = 'none';
+                return;
+            }
+
+            renderProducts(products);
+        }
+
+        function renderProducts(productsToShow) {
+            const container = document.getElementById('products');
+            const loading = document.getElementById('loading');
+
+            if (productsToShow.length === 0) {
+                loading.innerHTML = 'Nenhum produto corresponde aos filtros selecionados.';
+                loading.style.display = 'block';
+                container.style.display = 'none';
+                return;
+            }
+
+            loading.style.display = 'none';
+            container.style.display = 'grid';
+            container.innerHTML = '';
+
+            // Group by name (which now includes color) to show only one representative per color
+            const grouped = {};
+            productsToShow.forEach(p => {
+                if (!grouped[p.name]) grouped[p.name] = p;
+            });
+
+            Object.values(grouped).forEach(product => {
+                const card = `
+                    <a href="produto.html?id=${product.id}" style="text-decoration: none; color: inherit;">
+                        <div class="product-card" style="cursor: pointer;">
+                            <img src="${product.image_url || 'assets/product_placeholder.jpg'}" alt="${product.name}" class="product-image">
+                            <div class="product-info">
+                                <span class="product-brand">Disponível em várias marcas</span>
+                                <h3 class="product-name">${product.name}</h3>
+                                <p class="product-color">Cor: ${product.color}</p>
+                                <p class="product-price" style="color: var(--primary); font-weight: 800; font-size: 1.4rem; margin-top: 1rem;">R$ ${product.price ? product.price.toFixed(2).replace('.', ',') : 'Sob consulta'}</p>
+                            </div>
+                        </div>
+                    </a>
+                `;
+                container.innerHTML += card;
+            });
+        }
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthButton();
+            fetchProducts();
+        });
+    </script>
+</body>
+
+</html>

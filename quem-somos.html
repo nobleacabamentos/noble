@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quem Somos | Noble Acabamentos</title>
+    <meta name="description"
+        content="Conheça a história e os valores da Noble Acabamentos, especialista em acabamentos para telhados em Cocal do Sul.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
+                    <span>NOBLE</span> ACABAMENTOS
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="quem-somos.html">Quem Somos</a></li>
+                    <li><a href="loja.html">Loja</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li id="auth-link"><a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero"
+        style="height: 60vh; background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/hero_roofing.jpg'); background-size: cover; background-position: center;">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Nossa História</h1>
+                <p>Paixão pela arquitetura e compromisso com a excelência desde a fundação.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="container">
+            <div class="grid" style="align-items: center; gap: 4rem;">
+                <div>
+                    <h2 style="margin-bottom: 2rem;">Experiência e Tecnologia</h2>
+                    <p style="margin-bottom: 1.5rem;">A Noble Acabamentos para Telhados foi constituída com um corpo
+                        técnico formado por profissionais com mais de 50 anos de experiência na área técnica de
+                        cerâmica.</p>
+                    <p style="margin-bottom: 1.5rem;">Trabalhamos com fornos elétricos de alta tecnologia, que realizam
+                        o cozimento a 1200 °C com zero emissão de gases na atmosfera, garantindo qualidade superior e
+                        total respeito ao meio ambiente.</p>
+                    <p style="margin-bottom: 1.5rem;">Nossa empresa tem orgulho de atuar de forma sustentável, adotando
+                        processos de reaproveitamento de resíduos industriais em circuito fechado, eliminando a emissão
+                        de poluentes e reduzindo impactos ambientais.</p>
+                    <p>Compromisso técnico, inovação e responsabilidade ambiental são os pilares que sustentam a Noble
+                        Acabamentos.</p>
+                </div>
+                <div>
+                    <img src="assets/roof_tile_detail.jpg" alt="Detalhe de Telhado"
+                        style="width: 100%; border-radius: 8px; box-shadow: var(--shadow);">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section style="background-color: var(--white);">
+        <div class="container">
+            <h2 style="text-align: center; margin-bottom: 4rem;">Nossos Valores</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Qualidade</h3>
+                    <p>Corpo técnico com 50 anos de experiência e controle rigoroso de queima a 1200°C.</p>
+                </div>
+                <div class="card">
+                    <h3>Responsabilidade</h3>
+                    <p>Compromisso com o meio ambiente através do uso de energia limpa e zero emissão de gases.</p>
+                </div>
+                <div class="card">
+                    <h3>Sustentabilidade</h3>
+                    <p>Processos de circuito fechado com reaproveitamento total de resíduos industriais.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <h4>Noble Acabamentos</h4>
+                    <p style="color: var(--text-light); font-size: 0.9rem; margin-top: 1rem;">Beleza e proteção para o
+                        seu lar.</p>
+                </div>
+                <div>
+                    <h4>Links Úteis</h4>
+                    <ul style="list-style: none; margin-top: 1rem;">
+                        <li><a href="legal.html" style="font-size: 0.9rem; color: var(--text-light);">Termos e
+                                Condições</a></li>
+                        <li><a href="legal.html" style="font-size: 0.9rem; color: var(--text-light);">Política de
+                                Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noble Acabamentos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODUyODMsImV4cCI6MjA4NzM2MTI4M30.Zkn5oXvHzqAvOyIrEUQeRLFto_dibEQo9ynBqtidQv8';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function updateAuthButton() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authLink = document.getElementById('auth-link');
+            if (session) {
+                authLink.innerHTML = `<a href="#" onclick="handleLogout()" class="btn-nav">Sair</a>`;
+            } else {
+                authLink.innerHTML = `<a href="login.html" class="btn-nav">Entrar</a>`;
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateAuthButton);
+    </script>
+</body>
+
+</html>

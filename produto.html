@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produto | Noble Acabamentos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .product-detail {
+            padding-top: 150px;
+            padding-bottom: 100px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .detail-image {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            background: #fff;
+        }
+
+        .detail-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .detail-brand {
+            color: var(--accent);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .detail-meta {
+            margin: 2rem 0;
+            padding: 1.5rem;
+            background: var(--white);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .detail-meta p {
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .detail-meta span {
+            color: var(--text-light);
+            font-weight: 400;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .variation-selector {
+            margin-top: 1.5rem;
+        }
+
+        .variation-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+        }
+
+        .variation-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .variation-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+
+        .variation-btn:hover {
+            border-color: var(--accent);
+        }
+
+        .variation-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <nav>
+                <a href="index.html" class="logo">
+                    <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
+                    <span>NOBLE</span> ACABAMENTOS
+                </a>
+                <ul class="nav-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="quem-somos.html">Quem Somos</a></li>
+                    <li><a href="loja.html">Loja</a></li>
+                    <li><a href="contato.html">Contato</a></li>
+                    <li id="auth-link"><a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container product-detail">
+        <a href="loja.html" class="back-btn">← Voltar para a Loja</a>
+        <div id="loading" class="loading">Carregando detalhes do produto...</div>
+        <div id="product-content" style="display: none;">
+            <div class="detail-grid">
+                <img id="p-image" src="" alt="Produto" class="detail-image">
+                <div class="detail-info">
+                    <span id="p-brand" class="detail-brand"></span>
+                    <h1 id="p-name"></h1>
+                    <p id="p-description" style="color: var(--text-light); margin-bottom: 2rem;"></p>
+
+                    <div class="detail-meta">
+                        <p>Categoria: <span id="p-category"></span></p>
+                    </div>
+
+                    <div class="variation-selector">
+                        <span class="variation-label">Disponível nas Marcas:</span>
+                        <div id="brand-options" class="variation-options"></div>
+
+                        <span class="variation-label">Cores:</span>
+                        <div id="color-options" class="variation-options"></div>
+                    </div>
+
+                    <a href="contato.html" class="btn" style="margin-top: 1rem;">Solicitar Orçamento</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Noble Acabamentos. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3ODUyODMsImV4cCI6MjA4NzM2MTI4M30.Zkn5oXvHzqAvOyIrEUQeRLFto_dibEQo9ynBqtidQv8';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function updateAuthButton() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authLink = document.getElementById('auth-link');
+            if (session) {
+                authLink.innerHTML = `<a href="#" onclick="handleLogout()" class="btn-nav">Sair</a>`;
+            } else {
+                authLink.innerHTML = `<a href="login.html" class="btn-nav">Entrar</a>`;
+            }
+        }
+
+        async function handleLogout() {
+            await supabaseClient.auth.signOut();
+            window.location.reload();
+        }
+
+        async function fetchProductDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (!productId) {
+                window.location.href = 'loja.html';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .eq('id', productId)
+                    .single();
+
+                if (error) throw error;
+                if (!data) throw new Error('Produto não encontrado');
+
+                displayProduct(data);
+            } catch (error) {
+                console.error('Error fetching product:', error);
+                document.getElementById('loading').innerHTML = 'Erro: ' + error.message;
+            }
+        }
+
+        function displayProduct(product) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('product-content').style.display = 'block';
+
+            document.getElementById('p-image').src = product.image_url || 'assets/product_placeholder.jpg';
+            document.getElementById('p-image').alt = product.name;
+            document.getElementById('p-brand').textContent = product.brand;
+            document.getElementById('p-name').textContent = product.name;
+            document.getElementById('p-description').textContent = product.description || 'Acabamento premium de alta durabilidade e design exclusivo para o seu projeto.';
+            document.getElementById('p-category').textContent = product.category || 'N/A';
+
+            // Fetch variations
+            fetchVariations(product);
+
+            // Update page title
+            document.title = `${product.name} | Noble Acabamentos`;
+        }
+
+        async function fetchVariations(currentProduct) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('id, brand, color')
+                    .eq('name', currentProduct.name);
+
+                if (error) throw error;
+
+                // Group by brand since color is now part of the product identity (name)
+                const brands = [...new Set(data.map(p => p.brand))].sort();
+
+                // Keep colors as a secondary variation if they want to switch color while in the same product type
+                // But for now, brand is the main variation requested
+                const brandOpts = document.getElementById('brand-options');
+                brandOpts.innerHTML = '';
+                brands.forEach(brand => {
+                    const btn = document.createElement('button');
+                    btn.className = `variation-btn ${brand === currentProduct.brand ? 'active' : ''}`;
+                    btn.textContent = brand;
+                    btn.onclick = () => switchBrand(data, brand);
+                    brandOpts.appendChild(btn);
+                });
+
+                // Colors will still be shown but they lead to a different product name/id
+                const colorOpts = document.getElementById('color-options');
+                colorOpts.innerHTML = '';
+                // Since name includes color, we search for same category but potentially different names
+                const { data: allSameCategory, error: catError } = await supabaseClient
+                    .from('products')
+                    .select('id, name, color, brand')
+                    .eq('category', currentProduct.category)
+                    .eq('brand', currentProduct.brand);
+
+                if (!catError) {
+                    const colors = [...new Set(allSameCategory.map(p => p.color))].sort();
+                    colors.forEach(color => {
+                        const btn = document.createElement('button');
+                        btn.className = `variation-btn ${color === currentProduct.color ? 'active' : ''}`;
+                        btn.textContent = color;
+                        btn.onclick = () => {
+                            const found = allSameCategory.find(p => p.color === color);
+                            if (found) window.location.href = `produto.html?id=${found.id}`;
+                        };
+                        colorOpts.appendChild(btn);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error fetching variations:', error);
+            }
+        }
+
+        function switchBrand(data, brand) {
+            const found = data.find(p => p.brand === brand);
+            if (found) {
+                window.location.href = `produto.html?id=${found.id}`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthButton();
+            fetchProductDetail();
+        });
+    </script>
+</body>
+
+</html>
