@@ -98,7 +98,8 @@ exports.handler = async (event) => {
                 price: opt.price,
                 delivery_time: opt.delivery_time,
                 company: { name: opt.company.name, picture: opt.company.picture }
-            }));
+            }))
+            .sort((a, b) => Number(a.price) - Number(b.price));
 
         return {
             statusCode: 200,
