@@ -30,6 +30,7 @@ exports.handler = async (event) => {
         const splitIntoVolumes = (items, dbProducts) => {
             const volumes = [];
             const MAX_WEIGHT_G = 30000;
+            const MAX_DIM = 100;
 
             items.forEach(item => {
                 const dbP = dbProducts.find(p => String(p.id) === String(item.id)) || {};
@@ -40,12 +41,20 @@ exports.handler = async (event) => {
                 const unitWi = dbP.width_cm || 20;
                 const unitH = dbP.height_cm || 15;
 
-                const unitsPerBucket = Math.floor(MAX_WEIGHT_G / unitW) || 1;
+                // Max items based on weight and dimensions (limiting to MAX_DIM)
+                const maxAcross = Math.floor(MAX_DIM / unitWi) || 1;
+                const maxHigh = Math.floor(MAX_DIM / unitH) || 1;
+                const maxItemsByDim = maxAcross * maxHigh;
+                const maxItemsByWeight = Math.floor(MAX_WEIGHT_G / unitW) || 1;
+
+                const unitsPerBucket = Math.min(maxItemsByDim, maxItemsByWeight);
 
                 let remainingQty = qty;
                 while (remainingQty > 0) {
                     const currentQty = Math.min(remainingQty, unitsPerBucket);
-                    const widthCount = Math.ceil(Math.sqrt(currentQty));
+
+                    // Try to make the stack as "square" as possible within the constraints
+                    const widthCount = Math.min(maxAcross, Math.ceil(Math.sqrt(currentQty)));
                     const heightCount = Math.ceil(currentQty / widthCount);
 
                     volumes.push({
