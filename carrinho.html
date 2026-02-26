@@ -372,7 +372,7 @@
                 if (itemsErr) throw itemsErr;
 
                 // 3. Gerar Link do Mercado Pago
-                const endpoint = '/functions/mercadopago-checkout';
+                const endpoint = '/.netlify/functions/mercadopago-checkout';
 
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -413,7 +413,7 @@
             optionsDiv.innerHTML = '<p>Calculando opções de entrega...</p>';
 
             try {
-                const endpoint = '/functions/melhorenvio-calculate';
+                const endpoint = '/.netlify/functions/melhorenvio-calculate';
 
                 const response = await fetch(endpoint, {
                     method: 'POST',

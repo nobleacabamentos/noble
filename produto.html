@@ -399,7 +399,7 @@
 
             try {
                 // Se estiver rodando localmente (Live Server), podemos apontar para o servidor local do Supabase
-                const endpoint = '/functions/mercadopago-checkout';
+                const endpoint = '/.netlify/functions/mercadopago-checkout';
                 const response = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
