@@ -12,6 +12,8 @@
     <link rel="icon" type="image/jpeg" href="assets/favicon.jpg">
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Shopping Cart Logic -->
+    <script src="cart.js"></script>
     <style>
         .product-detail {
             padding-top: 150px;
@@ -27,9 +29,12 @@
 
         .detail-image {
             width: 100%;
+            height: 500px;
+            object-fit: contain;
             border-radius: 8px;
             box-shadow: var(--shadow);
             background: #fff;
+            padding: 1.5rem;
         }
 
         .detail-info h1 {
@@ -125,14 +130,29 @@
             <nav>
                 <a href="index.html" class="logo">
                     <img src="assets/logo_na.png" alt="Noble Acabamentos Logo" style="height: 50px;">
-                    <span>NOBLE</span> ACABAMENTOS
+                    <div class="logo-text">
+                        <span class="noble">NOBLE</span>
+                        <span class="acabamentos">ACABAMENTOS</span>
+                    </div>
                 </a>
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="quem-somos.html">Quem Somos</a></li>
+                    <li><a href="index.html">Início</a></li>
                     <li><a href="loja.html">Loja</a></li>
+                    <li><a href="quem-somos.html">Quem Somos</a></li>
                     <li><a href="contato.html">Contato</a></li>
                     <li id="auth-link"><a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>
+                    </li>
+                    <li>
+                        <a href="carrinho.html" class="cart-link">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                            <span id="cart-count" class="cart-count">0</span>
+                        </a>
                     </li>
                 </ul>
             </nav>
@@ -158,21 +178,39 @@
                         <div id="brand-options" class="variation-options"></div>
                     </div>
 
+                    <div class="quantity-selector">
+                        <span class="variation-label" style="margin-bottom: 0;">Quantidade (Caixas):</span>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="updateQty(-1)">-</button>
+                            <input type="number" id="qty-input" class="qty-input" value="1" min="1">
+                            <button class="qty-btn" onclick="updateQty(1)">+</button>
+                        </div>
+                    </div>
+
                     <div class="hero-btns" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
-                        <button id="pay-btn" onclick="initializeCheckout()" class="btn"
+                        <button id="add-to-cart-btn" onclick="addToCart()" class="btn"
                             style="background-color: var(--primary); width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                            Finalizar Compra (Cartão/PIX)
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <circle cx="9" cy="21" r="1" />
+                                <circle cx="20" cy="21" r="1" />
+                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                            </svg>
+                            Adicionar ao Carrinho
                         </button>
 
-                        <a id="whatsapp-btn" href="#" target="_blank" class="btn"
-                            style="background-color: #25d366; border-color: #25d366; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                viewBox="0 0 16 16">
-                                <path
-                                    d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+                        <button id="buy-now-btn" onclick="buyNow()" class="btn"
+                            style="background-color: #27ae60; border-color: #27ae60; width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
                             </svg>
-                            Comprar via WhatsApp
-                        </a>
+                            Comprar Agora (Finalizar)
+                        </button>
                     </div>
                 </div>
             </div>
@@ -197,9 +235,9 @@
             const { data: { session } } = await supabaseClient.auth.getSession();
             const authLink = document.getElementById('auth-link');
             if (session) {
-                authLink.innerHTML = `<a href="#" onclick="handleLogout()" class="btn-nav">Sair</a>`;
+                authLink.innerHTML = `<a href="painel.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Minha Conta</a>`;
             } else {
-                authLink.innerHTML = `<a href="login.html" class="btn-nav">Entrar</a>`;
+                authLink.innerHTML = `<a href="login.html" class="btn btn-sm" style="padding: 0.5rem 1rem;">Login</a>`;
             }
         }
 
@@ -242,14 +280,37 @@
             document.getElementById('p-image').alt = product.name;
             document.getElementById('p-brand').textContent = product.brand;
             document.getElementById('p-name').textContent = product.name;
-            document.getElementById('p-price').textContent = product.price ? `R$ ${product.price.toFixed(2).replace('.', ',')}` : 'Sob consulta';
+
+            const hasDiscount = product.original_price && product.original_price > product.price;
+            const discountPercent = hasDiscount ? Math.round((1 - (product.price / product.original_price)) * 100) : 0;
+
+            let priceHTML = '';
+            if (product.price) {
+                if (hasDiscount) {
+                    priceHTML = `
+                        <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                            <span style="text-decoration: line-through; color: #95a5a6; font-size: 1.2rem; font-weight: 400;">De: R$ ${product.original_price.toFixed(2).replace('.', ',')}</span>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">R$ ${product.price.toFixed(2).replace('.', ',')}</span>
+                                <span style="background: var(--accent); color: white; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 1rem;">-${discountPercent}%</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    priceHTML = `<span style="font-size: 2.5rem; font-weight: 800; color: var(--primary);">R$ ${product.price.toFixed(2).replace('.', ',')}</span>`;
+                }
+                const unitsMatch = product.description ? product.description.match(/Caixa com \d+ (Unidades|Pe[çc]as)/i) : null;
+                const unitsText = unitsMatch ? unitsMatch[0] : 'Caixa com 12 Unidades';
+                priceHTML += `<span style="font-size: 1.3rem; color: var(--accent); font-weight: 800; display: block; margin-top: 0.5rem; text-transform: uppercase;">${unitsText}</span>`;
+            } else {
+                priceHTML = 'Sob consulta';
+            }
+
+            document.getElementById('p-price').innerHTML = priceHTML;
             document.getElementById('p-description').textContent = product.description || 'Acabamento premium de alta durabilidade e design exclusivo para o seu projeto.';
 
-            // Update WhatsApp link
-            const phone = "5548988799001";
-            const message = `Olá! Gostaria de comprar o ${product.name} da marca ${product.brand} na cor ${product.color}.`;
-            const whatsappUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
-            document.getElementById('whatsapp-btn').href = whatsappUrl;
+            // Salva o produto globalmente para o carrinho
+            window.currentProduct = product;
 
             // Fetch variations
             fetchVariations(product);
@@ -293,6 +354,39 @@
             }
         }
 
+        // Funções do Carrinho e Quantidade
+        function updateQty(delta) {
+            const input = document.getElementById('qty-input');
+            let val = parseInt(input.value) + delta;
+            if (val < 1) val = 1;
+            input.value = val;
+        }
+
+        function addToCart() {
+            if (!window.currentProduct) return;
+
+            const qty = parseInt(document.getElementById('qty-input').value);
+            Cart.addItem(window.currentProduct, qty);
+
+            // Feedback para o usuário
+            const btn = document.getElementById('add-to-cart-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✔ Adicionado!';
+            btn.style.backgroundColor = '#27ae60';
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.backgroundColor = 'var(--primary)';
+            }, 2000);
+        }
+
+        function buyNow() {
+            if (!window.currentProduct) return;
+            const qty = parseInt(document.getElementById('qty-input').value);
+            Cart.addItem(window.currentProduct, qty);
+            window.location.href = 'carrinho.html';
+        }
+
         async function initializeCheckout() {
             const urlParams = new URLSearchParams(window.location.search);
             const productId = urlParams.get('id');
@@ -304,17 +398,23 @@
             payBtn.textContent = 'Gerando link de pagamento...';
 
             try {
-                // Chama a Edge Function do Supabase
-                const { data, error } = await supabaseClient.functions.invoke('mercadopago-checkout', {
-                    body: { productId }
+                // Se estiver rodando localmente (Live Server), podemos apontar para o servidor local do Supabase
+                const endpoint = '/functions/mercadopago-checkout';
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: [{
+                            id: window.currentProduct.id,
+                            name: window.currentProduct.name,
+                            price: window.currentProduct.price,
+                            quantity: qty
+                        }]
+                    })
                 });
-
-                if (error) throw error;
-                if (data.checkoutUrl) {
-                    window.location.href = data.checkoutUrl;
-                } else {
-                    throw new Error('Link de pagamento não gerado.');
-                }
+                const data = await response.json();
+                if (data.checkoutUrl) window.location.href = data.checkoutUrl;
+                else throw new Error(data.error || 'Erro no checkout');
             } catch (err) {
                 console.error('Checkout error:', err);
                 alert('Erro ao processar pagamento: ' + err.message);
@@ -328,6 +428,13 @@
             fetchProductDetail();
         });
     </script>
+    <!-- Botão Flutuante WhatsApp -->
+    <a href="https://wa.me/5548988799001" class="whatsapp-float" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+            <path
+                d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z" />
+        </svg>
+    </a>
 </body>
 
 </html>

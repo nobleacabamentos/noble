@@ -1,0 +1,18 @@
+# Segredos e Chaves
+.env
+supabase/.env
+mock-payment-server.js
+
+# Scripts de utilidade local
+update_conexao.js
+update_terminal_data.js
+check_terminal_data.js
+
+# Dependências e Builds
+node_modules/
+.supabase/
+.netlify/
+
+# Logs e Temporários
+npm-debug.log*
+.DS_Store
