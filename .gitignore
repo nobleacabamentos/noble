@@ -1,5 +1,6 @@
 # Segredos e Chaves
 .env
+.env.example
 supabase/.env
 mock-payment-server.js
 

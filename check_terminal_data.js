@@ -1,5 +1,6 @@
-const SUPABASE_URL = 'https://xpoktmqxmgduginmqojf.supabase.co/rest/v1/products';
-const SUPABASE_SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb2t0bXF4bWdkdWdpbm1xb2pmIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTc4NTI4MywiZXhwIjoyMDg3MzYxMjgzfQ.33gs-0vC7pahR5Jg1eO_3uponlzmBp2OiVMwPdEnM0E';
+require('dotenv').config();
+const SUPABASE_URL = process.env.SUPABASE_URL + '/rest/v1/products';
+const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const headers = {
     'apikey': SUPABASE_SERVICE_ROLE_KEY,
