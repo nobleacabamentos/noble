@@ -13,7 +13,22 @@ exports.handler = async (event) => {
 
     try {
         const { order_id } = JSON.parse(event.body);
-        const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ME_TOKEN, STORE_ORIGIN_CEP, USE_SANDBOX } = process.env;
+        const {
+            SUPABASE_URL,
+            SUPABASE_SERVICE_ROLE_KEY,
+            ME_TOKEN,
+            STORE_ORIGIN_CEP,
+            USE_SANDBOX,
+            STORE_NAME,
+            STORE_DOCUMENT,
+            STORE_PHONE,
+            STORE_EMAIL,
+            STORE_ADDRESS,
+            STORE_NUMBER,
+            STORE_DISTRICT,
+            STORE_CITY,
+            STORE_STATE
+        } = process.env;
 
         const ME_URL = USE_SANDBOX === 'true' ? "https://sandbox.melhorenvio.com.br" : "https://www.melhorenvio.com.br";
 
@@ -78,7 +93,18 @@ exports.handler = async (event) => {
 
         const cartPayload = {
             service: order.shipping_method_id,
-            from: { name: "Noble Acabamentos", phone: "48988799001", email: "contato@nobleacabamentos.com.br", document: "32514476000137", address: "Rua Zelcy Burigo", number: "658", district: "Jardim Itália", city: "Cocal do Sul", state_abbr: "SC", postal_code: STORE_ORIGIN_CEP },
+            from: {
+                name: STORE_NAME || "Noble Acabamentos",
+                phone: (STORE_PHONE || "48988799001").replace(/\D/g, ''),
+                email: STORE_EMAIL || "contato@nobleacabamentos.com.br",
+                document: (STORE_DOCUMENT || "32514476000137").replace(/\D/g, ''),
+                address: STORE_ADDRESS || "Rua Zelcy Burigo",
+                number: STORE_NUMBER || "658",
+                district: STORE_DISTRICT || "Jardim Itália",
+                city: STORE_CITY || "Cocal do Sul",
+                state_abbr: STORE_STATE || "SC",
+                postal_code: (STORE_ORIGIN_CEP || "").replace(/\D/g, '')
+            },
             to: { name: receiver.full_name || "Cliente", phone: (receiver.phone || "").replace(/\D/g, ''), email: receiver.email || "email@naoinformado.com", document: (receiver.cpf_cnpj || "").replace(/\D/g, ''), address: receiver.logradouro, number: receiver.numero, complement: receiver.complemento || "", district: receiver.bairro, city: receiver.cidade, state_abbr: receiver.uf, postal_code: (receiver.cep || "").replace(/\D/g, '') },
             products: order.order_items.map(i => ({ name: i.name, quantity: i.quantity, unitary_value: Number(i.price) })),
             volumes: finalVolumes,
